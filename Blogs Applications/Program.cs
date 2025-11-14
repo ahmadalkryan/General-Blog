@@ -36,14 +36,19 @@ builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJsonFieldsSerializer, JsonFieldsSerializer>();
 //builder.Services.AddScoped<Seed>();
-builder.Services.AddScoped<IAIService, OpenAIService>();
-builder.Services.AddHttpClient<OpenAIService>();
+builder.Services.AddScoped<IAIService, TinyLlamaAIService>();
+//builder.Services.AddScoped<IAIService, OpenAIService>();
+//builder.Services.AddHttpClient<OpenAIService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHash, PasswordHasher>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
 builder.Services.AddScoped<ICommentService, CommentService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ITokenBlackList, TokenBlackList>();
+builder.Services.AddScoped<ISummaryService, SummaryService>();
+builder.Services.AddScoped<IAskService, AskService>();
+//builder.Services.AddHttpClient<IAIService, DeepSeekService>();
+//builder.Services.AddScoped<IAIService, DeepSeekService>();
 builder.Services.AddHttpContextAccessor();
 
 
@@ -52,7 +57,7 @@ builder.Services.AddAutoMapper(typeof(ArticleProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(CategoryProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(CommentProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
-
+builder.Services.AddAutoMapper(typeof(SummaryProfile).Assembly);
 
 
 

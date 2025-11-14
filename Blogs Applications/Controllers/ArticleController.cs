@@ -1,4 +1,6 @@
-﻿using Applicarion.Dto.ArticleDto;
+﻿using Applicarion.Dto.ArticelQuestions;
+using Applicarion.Dto.ArticleDto;
+using Applicarion.Dto.Summary;
 using Applicarion.IService;
 using Application.Dtos.Action;
 using Application.Serializer;
@@ -13,12 +15,16 @@ namespace Blogs_Applications.Controllers
     public class ArticleController : ControllerBase
     {
         private readonly IArticleService _articleService;
+        private readonly IAskService _askService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ISummaryService _summaryService;
         private readonly IJsonFieldsSerializer _josnFieldSeriliezer;
         public ArticleController(IArticleService articleService ,IJsonFieldsSerializer jsonFieldsSerializer
-            ,IWebHostEnvironment webHostEnvironment )
+            ,IWebHostEnvironment webHostEnvironment ,ISummaryService summary ,IAskService askService )
         {
             _articleService = articleService;
+            _summaryService = summary;
+            _askService = askService;
             _webHostEnvironment = webHostEnvironment;
             _josnFieldSeriliezer = jsonFieldsSerializer;
             
@@ -122,6 +128,44 @@ namespace Blogs_Applications.Controllers
             }
             return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
                 new ApiResponse(true, "Article loaded successfully", StatusCodes.Status200OK, result), string.Empty));
+        }
+        [HttpGet]
+        [ProducesResponseType(typeof(ApiResponse<List<ArticleDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> SummarizeArticle(int articleId )
+        {
+
+            var result = await _summaryService.GenerateSummaryForArticle(articleId);
+
+            if (result == null)
+            {
+                return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                    new ApiResponse(false, "failed loaded ", StatusCodes.Status400BadRequest), string.Empty));
+
+            }
+            return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                new ApiResponse(true, "summary loaded successfully", StatusCodes.Status200OK, result), string.Empty));
+        }
+        [HttpPost]
+        [ProducesResponseType(typeof(ApiResponse<List<ArticleDto>>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> AskForArticle(CreateAnswer createAnswer)
+        {
+
+            var result = await _askService.AskQuestion(createAnswer);
+
+            if (result == null)
+            {
+                return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                    new ApiResponse(false, "failed loaded ", StatusCodes.Status400BadRequest), string.Empty));
+
+            }
+            return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                new ApiResponse(true, "answer loaded successfully", StatusCodes.Status200OK, result), string.Empty));
         }
 
 
