@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(BlogDbContext))]
-    [Migration("20251110195047_ai")]
-    partial class ai
+    [Migration("20251202062626_بهقسف")]
+    partial class بهقسف
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -218,6 +218,176 @@ namespace Infrastructure.Migrations
                     b.ToTable("Comments", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.GlobalChat", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("_globalChat");
+
+                    b.HasData(
+                        new
+                        {
+                            ID = 2,
+                            CreatedAt = new DateTime(2025, 12, 2, 9, 26, 26, 291, DateTimeKind.Local).AddTicks(3478),
+                            Description = "المحادثة المفتوحة لجميع المستخدمين",
+                            Name = " GolbalChat For system"
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Entities.GlobalMessage", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MessageType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("senderId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("senderId");
+
+                    b.ToTable("_golbalMessages");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Like", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("ID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("CreatedAt")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<int>("articleId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("userId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("articleId");
+
+                    b.HasIndex("userId")
+                        .IsUnique();
+
+                    b.ToTable("likes", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("MessageId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MessageNotification")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("receiverId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("IsRead");
+
+                    b.HasIndex("MessageId");
+
+                    b.HasIndex("receiverId");
+
+                    b.ToTable("_notification");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Persona", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("Id");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("Bio")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Location")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("userId")
+                        .HasColumnType("int");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("userId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfile", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
                     b.Property<int>("ID")
@@ -243,8 +413,7 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("UserName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("ID");
 
@@ -315,11 +484,70 @@ namespace Infrastructure.Migrations
                     b.Navigation("_user");
                 });
 
+            modelBuilder.Entity("Domain.Entities.GlobalMessage", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "_user")
+                        .WithMany("_Messages")
+                        .HasForeignKey("senderId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("_user");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Like", b =>
+                {
+                    b.HasOne("Domain.Entities.Article", "_article")
+                        .WithMany("_likes")
+                        .HasForeignKey("articleId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "_user")
+                        .WithOne("_like")
+                        .HasForeignKey("Domain.Entities.Like", "userId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("_article");
+
+                    b.Navigation("_user");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Notification", b =>
+                {
+                    b.HasOne("Domain.Entities.GlobalMessage", "_globalMessage")
+                        .WithMany("_notifications")
+                        .HasForeignKey("MessageId")
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.User", "_receiver")
+                        .WithMany("ReceivedNotifications")
+                        .HasForeignKey("receiverId")
+                        .IsRequired();
+
+                    b.Navigation("_globalMessage");
+
+                    b.Navigation("_receiver");
+                });
+
+            modelBuilder.Entity("Domain.Entities.Persona", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "_user")
+                        .WithOne("_userProfile")
+                        .HasForeignKey("Domain.Entities.Persona", "userId")
+                        .IsRequired();
+
+                    b.Navigation("_user");
+                });
+
             modelBuilder.Entity("Domain.Entities.Article", b =>
                 {
                     b.Navigation("_articleQuestions");
 
                     b.Navigation("_comments");
+
+                    b.Navigation("_likes");
 
                     b.Navigation("articleSummary");
                 });
@@ -329,13 +557,28 @@ namespace Infrastructure.Migrations
                     b.Navigation("_articles");
                 });
 
+            modelBuilder.Entity("Domain.Entities.GlobalMessage", b =>
+                {
+                    b.Navigation("_notifications");
+                });
+
             modelBuilder.Entity("Domain.Entities.User", b =>
                 {
+                    b.Navigation("ReceivedNotifications");
+
+                    b.Navigation("_Messages");
+
                     b.Navigation("_articleQuestions");
 
                     b.Navigation("_articles");
 
                     b.Navigation("_comments");
+
+                    b.Navigation("_like")
+                        .IsRequired();
+
+                    b.Navigation("_userProfile")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

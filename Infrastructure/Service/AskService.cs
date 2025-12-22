@@ -1,24 +1,29 @@
-﻿using Applicarion.Dto.ArticelQuestions;
-using Applicarion.IService;
+﻿
+
+
+
+using Applicaion.IService;
+using Applicaion.Dto.ArticelQuestions;
+using Application.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Infrastructure.Service
+namespace Application.Service
 {
     public class AskService : IAskService
     {
         private readonly IArticleService _articleService;
         private readonly IAIService _aiService;
-        
 
-        public AskService(IArticleService articleService , IAIService aIService)
+
+        public AskService(IArticleService articleService, IAIService aIService)
         {
             _aiService = aIService;
-            
-              _articleService = articleService;
+
+            _articleService = articleService;
         }
 
         public async Task<string> AskQuestion(CreateAnswer createAnswer)
@@ -31,6 +36,6 @@ namespace Infrastructure.Service
 
         }
 
-
+        
     }
 }

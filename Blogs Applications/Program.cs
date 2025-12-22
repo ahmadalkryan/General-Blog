@@ -1,7 +1,10 @@
-﻿using Applicarion.IRepository;
-using Applicarion.IService;
-using Applicarion.Mapper;
+﻿using Applicaion.IRepository;
+using Applicaion.IService;
+
+using Application.IService;
+using Application.Mapper;
 using Application.Serializer;
+using Application.Service;
 using Blogs_Applications.TokenBlackListMiddleWare;
 using Infrastructure;
 using Infrastructure.Repository;
@@ -25,6 +28,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 builder.Services.AddDbContext<BlogDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("default")));
 
@@ -35,10 +39,15 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 builder.Services.AddScoped<IArticleRepository, ArticleRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJsonFieldsSerializer, JsonFieldsSerializer>();
-//builder.Services.AddScoped<Seed>();
+builder.Services.AddHttpClient<IAIService, TinyLlamaAIService>((provider, client) =>
+{
+  
+    client.BaseAddress = new Uri("http://localhost:11434");
+    client.Timeout = TimeSpan.FromMinutes(2);
+    client.DefaultRequestHeaders.Add("User-Agent", "MyApp/1.0");
+});
 builder.Services.AddScoped<IAIService, TinyLlamaAIService>();
-//builder.Services.AddScoped<IAIService, OpenAIService>();
-//builder.Services.AddHttpClient<OpenAIService>();
+
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IPasswordHash, PasswordHasher>();
 builder.Services.AddScoped<IArticleService, ArticleService>();
@@ -47,8 +56,14 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<ITokenBlackList, TokenBlackList>();
 builder.Services.AddScoped<ISummaryService, SummaryService>();
 builder.Services.AddScoped<IAskService, AskService>();
-//builder.Services.AddHttpClient<IAIService, DeepSeekService>();
-//builder.Services.AddScoped<IAIService, DeepSeekService>();
+builder.Services.AddScoped<ILikeService,LikeService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
+builder.Services.AddScoped<IGlobalChatService, GlobalChatService>();
+builder.Services.AddScoped<INotiService, NotiService>();
+builder.Services.AddScoped<IApprovalService, ApprovalService>();
+
+
 builder.Services.AddHttpContextAccessor();
 
 
@@ -58,14 +73,22 @@ builder.Services.AddAutoMapper(typeof(CategoryProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(CommentProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(UserProfile).Assembly);
 builder.Services.AddAutoMapper(typeof(SummaryProfile).Assembly);
-
+builder.Services.AddAutoMapper(typeof(LikeProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(PersonaProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(NotificationProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(MessageProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(NotiProfile).Assembly);
+builder.Services.AddAutoMapper(typeof(AprovalProfile).Assembly);
 
 
 
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddControllers();
+
+
 // إضافة المصادقة JWT
+
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -89,32 +112,26 @@ builder.Services.AddAuthentication(options =>
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
 
         };
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+
+                if (!string.IsNullOrEmpty(accessToken) &&
+                    path.StartsWithSegments("/notificationHub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
     });
-//builder.Services.AddAuthentication(options =>
-//{
-//options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme,
-//options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme,
-//options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme
 
 
 
 
-
-//    )
-//    .AddJwtBearer(options =>
-//    {
-//        options.TokenValidationParameters = new TokenValidationParameters
-//        {
-//            ValidateIssuer = true,
-//            ValidateAudience = true,
-//            ValidateLifetime = true,
-//            ValidateIssuerSigningKey = true,
-//            ValidIssuer = builder.Configuration["Jwt:Issuer"],
-//            ValidAudience = builder.Configuration["Jwt:Audience"],
-//            IssuerSigningKey = new SymmetricSecurityKey(
-//                Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
-//        };
-//    });
 
 // في Program.cs لتحسين إعدادات الـ Memory Cache
 builder.Services.AddMemoryCache(options =>
@@ -123,23 +140,13 @@ builder.Services.AddMemoryCache(options =>
     options.CompactionPercentage = 0.25; // نسبة الضغط عند الوصول للحد
     options.ExpirationScanFrequency = TimeSpan.FromMinutes(5); // تكرار فحص الانتهاء
 });
+builder.Services.AddLogging(loggingBuilder =>
+{
+    loggingBuilder.AddConsole();
+    loggingBuilder.AddDebug();
+});
 
-//builder.Services.AddCors(options =>
-//{
-//    options.AddPolicy("DevCors", policy =>
 
-//    {
-//        policy.WithOrigins(
-//            "https://localhost:52091", //react
-
-//              "https://localhost:7148" //api
-
-//            )
-//              .AllowAnyMethod().
-//              AllowCredentials()
-//              .AllowAnyHeader();
-//    });
-//});
 builder.Services.AddCors(options =>
 {
 
@@ -179,29 +186,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-//using (var scope = app.Services.CreateScope())
-//{
-//    var services = scope.ServiceProvider;
-//    try
-//    {
-//        var context = services.GetRequiredService<BlogDbContext>();
-//        var seed = services.GetRequiredService<Seed>();
 
-//        // Ensure database is created
-//        context.Database.EnsureCreated();
-
-//        // Seed the data
-//        seed.SeedData();
-
-//        Console.WriteLine("Database seeded successfully!");
-//    }
-//    catch (Exception ex)
-//    {
-//        var logger = services.GetRequiredService<ILogger<Program>>();
-//        logger.LogError(ex, "An error occurred while seeding the database.");
-//    }
-//}
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -209,17 +194,10 @@ if (app.Environment.IsDevelopment())
 }
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 ///app.UseMiddleware<TokenBlackListMiddleWare>();
+app.MapHub<NotificationHub>("/notificationHub");
 app.UseCors("AllowAll");
 app.UseStaticFiles();
-//app.UseStaticFiles(); // هذه السطر ضروري
 
-// إذا كنت تستخدم مجلد مخصص غير wwwroot
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(
-//        Path.Combine(builder.Environment.ContentRootPath, "Images")),
-//    RequestPath = "/Images"
-//});
 
 app.UseHttpsRedirection();
 
@@ -231,3 +209,4 @@ app.Run();
 
 
 
+public partial class Program { }

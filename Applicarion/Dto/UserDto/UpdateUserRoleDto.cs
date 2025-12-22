@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Dto.UserDto
+namespace Applicaion.Dto.UserDto
 {
     public class UpdateUserRoleDto
     {

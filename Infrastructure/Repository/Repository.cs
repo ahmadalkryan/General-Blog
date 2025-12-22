@@ -1,4 +1,4 @@
-﻿using Applicarion.IRepository;
+﻿using Applicaion.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Infrastructure.Repository
 {
@@ -33,12 +34,12 @@ namespace Infrastructure.Repository
 
             //if (navigationProperties is not null)
             //{
-            //    foreach(var navigation in navigationProperties)
+            //    foreach (var navigation in navigationProperties)
             //    {
             //        query = query.Include(navigation);
             //    }
-            //    return  await  query.Where(predicate).ToListAsync();
-                
+            //    return await query.Where(predicate).ToListAsync();
+
             //}
             throw new NotImplementedException();
         }
@@ -104,6 +105,49 @@ namespace Infrastructure.Repository
              _set.Update(entity);
            await db.SaveChangesAsync();
             return entity;
+        }
+
+       public async Task InsertRangeAsync(IEnumerable<T> entities)
+        {
+            _set.AddRange(entities);
+            await db.SaveChangesAsync();
+        }
+
+       public Task UpdateRangeAsync(IEnumerable<T> entities)
+        {
+            _set.UpdateRange(entities);
+            return db.SaveChangesAsync();
+
+        }
+
+              public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter,
+                  params Expression<Func<T, object>>[] navigationProperties)
+        {
+            IQueryable<T> query = _set;
+            var navigations = db.Model.FindEntityType(typeof(T)).GetNavigations();
+            if (navigations != null)
+            {
+                foreach (var nav in navigations)
+                {
+                    query = query.Include(nav.Name);
+
+                }
+
+            }  
+                if (filter != null)
+                {
+                    query=query.Where(filter);
+                }
+                return await query.ToListAsync();
+            
+
+
+
+        }
+
+        Task<IEnumerable<T>> IRepository<T>.GetAllAsync(Expression<Func<T, bool>> filter)
+        {
+            throw new NotImplementedException();
         }
     }
 }

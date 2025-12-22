@@ -1,4 +1,4 @@
-﻿using Applicarion.Dto.UserDto;
+﻿using Applicaion.Dto.UserDto;
 using AutoMapper;
 using Domain.Entities;
 using System;
@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Mapper
+namespace Application.Mapper
 {
-    public class UserProfile:Profile
+    public class UserProfile:AutoMapper.Profile
     {
 
         public UserProfile()

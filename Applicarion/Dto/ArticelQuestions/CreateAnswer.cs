@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Dto.ArticelQuestions
+namespace Applicaion.Dto.ArticelQuestions
 {
     public  class CreateAnswer
     {

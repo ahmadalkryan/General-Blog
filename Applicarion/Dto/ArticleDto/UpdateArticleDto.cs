@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Dto.ArticleDto
+namespace Applicaion.Dto.ArticleDto
 {
     public class UpdateArticleDto
     {

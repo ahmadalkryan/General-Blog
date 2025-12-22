@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Dto.Summary
+namespace Applicaion.Dto.Summary
 {
     public class SummaryDto
     {

@@ -1,4 +1,4 @@
-﻿using Applicarion.IRepository;
+﻿using Applicaion.IRepository;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;

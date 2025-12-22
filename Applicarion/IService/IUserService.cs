@@ -1,4 +1,4 @@
-﻿using Applicarion.Dto.UserDto;
+﻿using Applicaion.Dto.UserDto;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.IService
+namespace Application.IService
 {
     public interface IUserService
     {

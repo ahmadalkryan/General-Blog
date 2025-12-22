@@ -1,6 +1,8 @@
-﻿using Applicarion.Dto.Summary;
-using Applicarion.IRepository;
-using Applicarion.IService;
+﻿using Applicaion.Dto.Summary;
+using Applicaion.IRepository;
+using Applicaion.IService;
+
+using Application.IService;
 using AutoMapper;
 using Domain.Entities;
 using System;
@@ -42,15 +44,18 @@ namespace Infrastructure.Service
             return _mapper.Map<SummaryDto>(result);
 
         }
-
+        public async Task<string> GetModelInfoAsync()
+        {
+            return await _aiService.GetModelInfoAsync();
+        }
          public async  Task<SummaryDto> GenerateSummaryForArticle(int articleId)
         {
-            //var summary = await GetSummaryForArticle(articleId);
-            //if (summary != null)
-            //{
-            //    return summary;
-            //}
-           
+            var summary = await GetSummaryForArticle(articleId);
+            if (summary != null)
+            {
+                return summary;
+            }
+
 
             var article = await _articleService.GetArticleByID(articleId);
             var summarizedText = await _aiService.SummarizeTextAsync(article.Content );

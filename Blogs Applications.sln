@@ -9,13 +9,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Infrastructure", "Infrastructure\Infrastructure.csproj", "{D513A8B1-4326-4447-86BA-1B9CA8849CAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Applicarion", "Applicarion\Applicarion.csproj", "{3FD8B2E9-EC28-46AB-B552-9E90954480B3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Applicarion\Application.csproj", "{3FD8B2E9-EC28-46AB-B552-9E90954480B3}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{8EC462FD-D22E-90A8-E5CE-7E832BA40C5D}"
 	ProjectSection(SolutionItems) = preProject
 		docker-compose.yml = docker-compose.yml
 		docker-run.bat = docker-run.bat
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{51FC2CF1-3A58-48E5-9168-FF166F3A1F98}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{3FD8B2E9-EC28-46AB-B552-9E90954480B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3FD8B2E9-EC28-46AB-B552-9E90954480B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3FD8B2E9-EC28-46AB-B552-9E90954480B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{51FC2CF1-3A58-48E5-9168-FF166F3A1F98}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{51FC2CF1-3A58-48E5-9168-FF166F3A1F98}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{51FC2CF1-3A58-48E5-9168-FF166F3A1F98}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{51FC2CF1-3A58-48E5-9168-FF166F3A1F98}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

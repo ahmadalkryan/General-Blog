@@ -1,6 +1,8 @@
-﻿using Applicarion.Dto.UserDto;
-using Applicarion.IRepository;
-using Applicarion.IService;
+﻿using Applicaion.Dto.UserDto;
+using Applicaion.IRepository;
+using Applicaion.Dto.UserDto;
+
+using Application.IService;
 using AutoMapper;
 using Azure.Core;
 using Domain.Entities;
@@ -18,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Service
 {
-    public class UserService : IUserService
+    public class UserService : Application.IService.IUserService
     {
         private readonly IRepository<User> _repository;
         private readonly IPasswordHash _passwordHasher;

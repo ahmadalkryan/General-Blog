@@ -1,7 +1,8 @@
-﻿using Applicarion.Dto.CategoryDto;
-using Applicarion.Dto.CommentDto;
-using Applicarion.IRepository;
-using Applicarion.IService;
+﻿
+
+using Applicaion.Dto.CategoryDto;
+using Applicaion.IRepository;
+using Application.IService;
 using AutoMapper;
 using Domain.Entities;
 using System;

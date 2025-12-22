@@ -27,6 +27,18 @@ namespace Domain.Entities
         public ICollection<Article> ?_articles { get; set; }
         public ICollection<Comment> ?_comments { get; set; }
 
+        public ICollection<GlobalMessage> _Messages { get; set; }
+        = new List<GlobalMessage>();
+
+        public ICollection<Notification> ReceivedNotifications { get; set; } = new List<Notification>();
+       
+        public ICollection<ArticleApproval> _articleApprovals { get; set; }= new List<ArticleApproval>();
+
+        public ICollection<ArticleNotification> _articleNotifications { get; set; }= new List<ArticleNotification>();   
+        public Persona _userProfile { get; set; }
+
+        public Like _like { get; set; }
+
 
     }
 

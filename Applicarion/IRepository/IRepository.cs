@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.IRepository
+namespace Applicaion.IRepository
 {
     public interface IRepository<T> where T : class
     {
@@ -21,13 +21,16 @@ namespace Applicarion.IRepository
 
         Task<T> Insertasync(T entity);
 
-       
+        Task InsertRangeAsync(IEnumerable<T> entities);
+        Task UpdateRangeAsync(IEnumerable<T> entities);
 
         Task<bool> Exists(object id);
 
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter=null,
+            params Expression<Func<T, object>>[] navigationProperties );
 
-
-
+        Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>> filter = null);
+           
 
 
 

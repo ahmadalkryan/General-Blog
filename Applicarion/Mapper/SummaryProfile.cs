@@ -1,4 +1,4 @@
-﻿using Applicarion.Dto.Summary;
+﻿using Applicaion.Dto.Summary;
 using AutoMapper;
 using Domain.Entities;
 using System;
@@ -7,9 +7,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Mapper
+namespace Application.Mapper
 {
-    public class SummaryProfile:Profile
+    public class SummaryProfile:AutoMapper.Profile
     {
         public SummaryProfile()
         {

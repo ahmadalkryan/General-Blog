@@ -1,4 +1,4 @@
-﻿using Applicarion.Dto.Common;
+﻿
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Dto.ArticleDto
+namespace Applicaion.Dto.ArticleDto
 {
     public class ArticleDto
     {
@@ -20,7 +20,7 @@ namespace Applicarion.Dto.ArticleDto
 
         public DateTime UpdatedAt { get; set; } 
 
-        public bool IsPublished { get; set; } = true;
+        public bool IsPublished { get; set; } =false;
 
 
         public int categoryId { get; set; }

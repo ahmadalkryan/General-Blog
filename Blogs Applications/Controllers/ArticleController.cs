@@ -1,7 +1,7 @@
-﻿using Applicarion.Dto.ArticelQuestions;
-using Applicarion.Dto.ArticleDto;
-using Applicarion.Dto.Summary;
-using Applicarion.IService;
+﻿using Applicaion.Dto.ArticelQuestions;
+using Applicaion.Dto.ArticleDto;
+using Applicaion.IService;
+
 using Application.Dtos.Action;
 using Application.Serializer;
 using Microsoft.AspNetCore.Hosting;
@@ -71,6 +71,15 @@ namespace Blogs_Applications.Controllers
             return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
                 new ApiResponse(true, "Article Created successfully", StatusCodes.Status200OK, result), string.Empty));
         }
+        [HttpGet]
+         public async Task<IActionResult> GetSummaryForArticle(int articleId)
+        {
+            var result = await _summaryService.GetSummaryForArticle(articleId);
+
+            return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                new ApiResponse(true, "summary loaded successfully", StatusCodes.Status200OK, result), string.Empty));
+
+        }
 
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponse<List<ArticleDto>>), StatusCodes.Status200OK)]
@@ -81,15 +90,46 @@ namespace Blogs_Applications.Controllers
 
             var result = await _articleService.GetAllArticles();
 
-            //  if(result == null)
-            //{
-            //    return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
-            //        new ApiResponse(false, "failed loaded ", StatusCodes.Status400BadRequest), string.Empty));
-
-            //}
+            
             return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
                 new ApiResponse(true, "Article loaded successfully", StatusCodes.Status200OK, result), string.Empty));
         }
+
+        [HttpGet]
+
+        public async Task<IActionResult> GetAllRejectArticles()
+        {
+
+            var result = await _articleService.GetRejectArticle();
+
+
+            return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                new ApiResponse(true, "Article loaded successfully", StatusCodes.Status200OK, result), string.Empty));
+        }
+        [HttpGet]
+
+        public async Task<IActionResult> GetAllPendingArticles()
+        {
+
+            var result = await _articleService.GetPendingArticle();
+
+
+            return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                new ApiResponse(true, "Article loaded successfully", StatusCodes.Status200OK, result), string.Empty));
+        }
+
+        [HttpGet]
+
+        public async Task<IActionResult> GetAll()
+        {
+
+            var result = await _articleService.GetAll();
+
+
+            return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                new ApiResponse(true, "Article loaded successfully", StatusCodes.Status200OK, result), string.Empty));
+        }
+
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponse<List<ArticleDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -109,7 +149,14 @@ namespace Blogs_Applications.Controllers
             return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
                 new ApiResponse(true, "Article loaded successfully", StatusCodes.Status200OK, result), string.Empty));
         }
-
+        [HttpGet]
+        public async Task<IActionResult>GetModelInfo( )
+        {
+            var result = await _summaryService.GetModelInfoAsync();
+            return new RawJsonActionResult(_josnFieldSeriliezer.Serialize(
+                new ApiResponse(true, "model info loaded successfully", StatusCodes.Status200OK, result), string.Empty));
+        }
+           
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponse<List<ArticleDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
@@ -149,10 +196,7 @@ namespace Blogs_Applications.Controllers
                 new ApiResponse(true, "summary loaded successfully", StatusCodes.Status200OK, result), string.Empty));
         }
         [HttpPost]
-        [ProducesResponseType(typeof(ApiResponse<List<ArticleDto>>), StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(typeof(void), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status500InternalServerError)]
+       
         public async Task<IActionResult> AskForArticle(CreateAnswer createAnswer)
         {
 

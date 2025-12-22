@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Dto.ArticleDto
+namespace Applicaion.Dto.ArticleDto
 {
     public class CrArticleDto
     {
@@ -17,8 +17,9 @@ namespace Applicarion.Dto.ArticleDto
 
 
         public int categoryId { get; set; }
+        public int CategoryId { get; set; }
 
-       // public int Id { get; set; }
+        // public int Id { get; set; }
 
         public bool? IsPublished { get; set; } = true;
     }

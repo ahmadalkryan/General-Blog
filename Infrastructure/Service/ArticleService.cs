@@ -1,30 +1,34 @@
-﻿using Applicarion.Dto.ArticleDto;
-using Applicarion.IRepository;
-using Applicarion.IService;
+﻿using Applicaion.Dto.ArticleDto;
+using Applicaion.IRepository;
+using Applicaion.IService;
+using Application.IService;
 using AutoMapper;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace Infrastructure.Service
 {
-    public class ArticleService : IArticleService
+    public class ArticleService :IArticleService
     {
-        private readonly IArticleRepository _articleRepository;
+        private readonly IRepository<Article> _articleRepository;
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-
-        public ArticleService(IUserService userService, IArticleRepository repository, IMapper mapper)
+        private readonly INotiService _notiService;
+       
+        public ArticleService(IUserService userService, IRepository<Article> repository, IMapper mapper, INotiService notiService )
         {
             _articleRepository = repository;
             _mapper = mapper;
+           
+
             _userService = userService;
+            _notiService = notiService;
         }
         public async Task<ArticleDto> CreateArticle(CrArticleDto createArticleDto)
         {
+            if (createArticleDto == null)
+                throw new ArgumentNullException(nameof(createArticleDto));
+
 
             var user = await _userService.GetCurrentUserAsync();
 
@@ -41,7 +45,11 @@ namespace Infrastructure.Service
             };
             var article = _mapper.Map<Article>(createart);
             var art = await _articleRepository.Insertasync(article);
-            return _mapper.Map<ArticleDto>(art);
+           var result =  _mapper.Map<ArticleDto>(art);
+
+            await _notiService.NotifyNewGlobalMessageAsync(result);
+            return result;
+
         }
 
         public async Task<ArticleDto> DeleteArticle(int id)
@@ -52,28 +60,12 @@ namespace Infrastructure.Service
 
             return _mapper.Map<ArticleDto>(art);
         }
-
+        //approval
         public async Task<IEnumerable<ArticleDto>> GetAllArticles()
         {
-            var articles = await _articleRepository.GetAllAsync();
+           // var articles = (await _articleRepository.GetAllAsync()).Where(x => x.IsPublished == true).ToList();
+           var articles= await _articleRepository.GetAllAsync(x=>x.IsPublished==true,x=>x._category,x=>x._user);
 
-
-            //var articleDtos = articles.Select(article => new ArticleDto
-            //{
-            //    ID = article.ID,
-            //    Title = article.Title,
-            //    Content = article.Content,
-            //    ImageUrl = article.ImageUrl,
-            //    CreatedAt = article.CreatedAt,
-            //    UpdatedAt = article.UpdatedAt,
-            //    IsPublished = article.IsPublished,
-            //    categoryId = article.categoryId,
-            //    userID = article.userID,
-            //    CategoryName = article._category?.CategoryName ?? "Uncategorized",
-            //    AuthorName = article._user?.UserName ?? "Unknown Author"
-            //}).ToList();
-
-            //return articleDtos;
             return _mapper.Map<IEnumerable<ArticleDto>>(articles);
         }
         public async Task<ArticleDto> GetArticleByID(int id)
@@ -96,14 +88,14 @@ namespace Infrastructure.Service
         public async Task<IEnumerable<ArticleDto>> FilterByCategory(int id)
         {
 
-            var art = await GetAllArticles();
-            var filtered = art.Where(a =>a.categoryId == id).ToList();
+            //var art = await GetAllArticles();
+            //var filtered = art.Where(a =>a.categoryId == id).ToList();
+            var articles = await _articleRepository.GetAllAsync(x => x.IsPublished == true && x.categoryId == id, x => x._category, x => x._user);
 
-            return _mapper.Map<IEnumerable<ArticleDto>>(filtered);
 
-           // var art = await _articleRepository.FindAsync(x => x._category.CategoryName == category, x => x._category);
+            return _mapper.Map<IEnumerable<ArticleDto>>(articles);
 
-            //return _mapper.Map<IEnumerable<ArticleDto>>(art);
+           
         }
 
         private double calculateSimilarityScore(Article article , string serachTerm)
@@ -154,6 +146,68 @@ namespace Infrastructure.Service
         {
             var  count = CountWordMatches(article, searchTerm);
             return (double)count / searchTerm.Length * 100;
+        }
+
+       public async Task<IEnumerable<ArticleDto>>GetApprovalArticles()
+        {
+            //var articles = await _articleRepository.GetAllAsync();
+
+            //var result = articles.Where(x=>x.IsPublished == true).ToList();
+            var articles =await _articleRepository.GetAllAsync(x=>x.IsPublished==true,x=>x._user ,x=>x._category);
+            return _mapper.Map<IEnumerable<ArticleDto>>(articles);
+        }
+
+        public  async Task<bool> ApproveArticle(int articleId)
+        {
+            var art = await _articleRepository.GetById(articleId);
+            art.IsPublished = true;
+            art.UpdatedAt=DateTime.Now;
+            await _articleRepository.UpdateAsync(art);
+            return true;
+
+        }
+
+        public Task<IEnumerable<ArticleDto>> GetAllApprovalsArticles()
+        {
+            throw new NotImplementedException();
+
+        }
+
+        public async Task<IEnumerable<ArticleDto>> GetRejectArticle()
+        {
+            //var allArticles = await _articleRepository.GetAllAsync();
+
+            //var rejectedArticles = allArticles
+            //    .Where(x => x.IsPublished == false &&
+            //               x.articleApproval != null &&
+            //               x.articleApproval.Status == ApprovalStatus.Rejected)
+            //    .ToList();
+            var articles =await _articleRepository.GetAllAsync(x=>x.IsPublished==false&&x.articleApproval.Status==ApprovalStatus.Rejected,x=>x._user ,x=>x._category);
+
+            return _mapper.Map<IEnumerable<ArticleDto>>(articles);
+            //var result = (await _articleRepository.GetAllAsync()).
+            //    Where(x => x.IsPublished == false &&x.articleApproval.Status==ApprovalStatus.Rejected).ToList();
+            //return _mapper.Map<IEnumerable< ArticleDto>>(result);
+        }
+
+       public async Task<IEnumerable<ArticleDto>> GetAll()
+        { 
+            var result = await _articleRepository.GetAllAsync();
+
+            return _mapper.Map<IEnumerable<ArticleDto>>(result);
+        }
+
+       public async  Task<IEnumerable<ArticleDto>> GetPendingArticle()
+        {
+            //var result = await _articleRepository.GetAllAsync();
+
+            //var pendingArticles = result
+            //     .Where(x => x.IsPublished == false &&
+            //                 (x.articleApproval == null))
+            //    .ToList();
+
+            var articles = await _articleRepository.GetAllAsync(x=>x.IsPublished==false&&x.articleApproval==null,x=>x.articleApproval,x=>x._user ,x=>x._category);
+            return _mapper.Map<IEnumerable<ArticleDto>>(articles);
         }
     }
 }

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.IRepository
+namespace Applicaion.IRepository
 {
     public interface IArticleRepository:IRepository<Article>
     {

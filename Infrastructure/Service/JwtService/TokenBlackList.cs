@@ -1,4 +1,4 @@
-﻿using Applicarion.IService;
+﻿using Application.IService;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;

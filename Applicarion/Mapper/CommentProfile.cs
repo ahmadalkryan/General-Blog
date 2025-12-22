@@ -5,12 +5,12 @@ using System.Text;
 using AutoMapper;
 using System.Threading.Tasks;
 using Domain.Entities;
-using Applicarion.Dto.CommentDto;
-using Applicarion.Dto.ArticleDto;
+using Applicaion.Dto.CommentDto;
 
-namespace Applicarion.Mapper
+
+namespace Application.Mapper
 {
-    public class CommentProfile:Profile
+    public class CommentProfile:AutoMapper.Profile
     {
         public CommentProfile()
         {

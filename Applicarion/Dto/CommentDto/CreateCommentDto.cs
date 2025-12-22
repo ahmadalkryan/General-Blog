@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Applicarion.Dto.CommentDto
+namespace Applicaion.Dto.CommentDto
 {
     public class CreateCommentDto
     {
